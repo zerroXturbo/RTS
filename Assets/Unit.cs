@@ -6,11 +6,11 @@ public class Unit : MonoBehaviour
     
     private void Start()
     {
-        UnitSelectionMovement.Instance.allUnitList.Add(gameObject);
+        UnitSelectionManager.Instance.allUnitList.Add(gameObject);
     }
 
     private void OnDestroy()
     {
-        UnitSelectionMovement.Instance.allUnitList.Remove(gameObject);
+        UnitSelectionManager.Instance.allUnitList.Remove(gameObject);
     }
 }

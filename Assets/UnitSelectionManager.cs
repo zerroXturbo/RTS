@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class UnitSelectionMovement : MonoBehaviour
+public class UnitSelectionManager : MonoBehaviour
 {
-    public static UnitSelectionMovement Instance;
+    public static UnitSelectionManager Instance;
     
     [SerializeField] public List<GameObject> allUnitList = new List<GameObject>();
     [SerializeField] private List<GameObject> unitsSelected = new List<GameObject>();
+    
     
     [SerializeField] private LayerMask clickableLayer;
     [SerializeField] private LayerMask groundLayer;
@@ -31,7 +32,9 @@ public class UnitSelectionMovement : MonoBehaviour
 
     private void Update()
     {
-        if (Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame)
+        if (Mouse.current == null) return;
+        
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             var ray = _cam.ScreenPointToRay(Mouse.current.position.ReadValue());
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, clickableLayer))
@@ -47,14 +50,14 @@ public class UnitSelectionMovement : MonoBehaviour
             }
             else
             {
-                if (!Keyboard.current.leftShiftKey.isPressed)
+                if (!Keyboard.current.leftShiftKey.wasPressedThisFrame)
                 {
                     DeselectAll();
                 }
             }
         }
 
-        if (Mouse.current != null && Mouse.current.rightButton.isPressed && unitsSelected.Count > 0)
+        if (Mouse.current.rightButton.isPressed && unitsSelected.Count > 0)
         {
             var ray = _cam.ScreenPointToRay(Mouse.current.position.ReadValue());
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, groundLayer))
@@ -87,7 +90,7 @@ public class UnitSelectionMovement : MonoBehaviour
         EnableUnitMovement(unit, true);
     }
 
-    private void DeselectAll()
+    public void DeselectAll()
     {
         foreach (var unit in unitsSelected)
         {
@@ -101,5 +104,13 @@ public class UnitSelectionMovement : MonoBehaviour
     {
         unit.GetComponent<Unit>().indicator.SetActive(isMove);
         unit.GetComponent<UnitMovement>().enabled = isMove;
+    }
+
+    public void DragSelect(GameObject unit)
+    {
+        if (unitsSelected.Contains(unit)) return;
+        
+        EnableUnitMovement(unit, true);
+        unitsSelected.Add(unit);
     }
 }
